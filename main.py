@@ -28,30 +28,6 @@ def function_for_id_lots(id_lots=None):
 def hello():
     return 'Hello world!!!'
 
-@app.route('/logout')
-def delete_data_autif():
-    # стирает данные о аутентификации
-    pass
-
-
-@app.route('/register')
-def store_password():
-    '''
-    POST /
-      -- пароли уже провалидированы, не нужно сохранять сессию
-      request: json { login: string, password: string, paswordConfirm: string }
-      request: json { user: {login: string} }
-      -> 201
-    '''
-
-
-@app.route('/login')
-def get_data_login():
-    '''
-    request: json { login: string, password: string }
-      response: json { user: {login: string}, token: string }
-    '''
-
 
 @app.route('/logout')
 def delete_data_autif():
