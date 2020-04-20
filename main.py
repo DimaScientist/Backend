@@ -55,6 +55,6 @@ def get_data_login():
     """
     pass
 
-
+print(__name__)
 if __name__ == 'main':
     app.run(debug=True)
