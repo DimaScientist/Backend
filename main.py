@@ -1,4 +1,5 @@
 from flask import Flask
+import pymongo
 
 # везде выводить до 200 записи
 
@@ -56,5 +57,14 @@ def get_data_login():
     pass
 
 
+@app.route('/mongo')
+def testMongoConnection():
+    conn = pymongo.MongoClient('mongodb://afanasiev_alexey:funny valentine did nothing wrong@140.82.36.93:27017/morning_wood')
+    name=conn.get_database().name
+    conn.close()
+    return name
+
+
+print(__name__)
 if __name__ == 'main':
     app.run(debug=True)
