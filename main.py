@@ -92,16 +92,17 @@ def register():
     pattern['time'] = get_current_time()
     token = jwt.encode(pattern, secretKey, algorithm='HS256')
     resp = Response('success')
-    resp.headers['Authorization'] = token
+    resp.headers['Authorization'] = 'Bearer ' + str(token)
     return resp
 
 
-# @app.route('/login')
-# def login():
-#     auth = request.headers['Authentification']
-#     object = jwt.decode(auth, secretKey, algorithm='HS256')
-#
-#     return 'asd'
+@app.route('/login')
+def login():
+    auth = request.headers['Authorizationn']
+    object = jwt.decode(auth, secretKey, algorithm='HS256')
+
+    return 'asd'
+
 
 @app.route('/register')
 def store_password():
