@@ -1,6 +1,8 @@
 from flask import Flask
+import time
 from flask import jsonify
 from flask import request
+from flask import Response
 import jwt
 from bson.objectid import ObjectId
 import pymongo
@@ -9,7 +11,7 @@ import pymongo
 
 app = Flask(__name__)
 secretKey = "makeAmericaGreatAgain"
-userTokenPassPattern = {"user": "", "pass": "", "time": 0}
+userTokenPassPattern = {'username': '', 'password_hash': '', 'time': 0}
 
 
 def get_connection():
@@ -19,6 +21,10 @@ def get_connection():
 
 def get_db(connection):
     return connection.get_database('morning_wood')
+
+
+def get_current_time():
+    return int(round(time.time() * 1000))
 
 
 def search_lots(id_lots):
@@ -73,11 +79,21 @@ def delete_data_autif():
 def register():
     data = request.json
     user = data['user']
-    password=data['pass']
+    password = data['pass']
     print(data)
     print(user)
     print(password)
-    return 'asdasfdcx'
+    bd = get_db(get_connection())
+    collection = bd.get_collection('users')
+    collection.insert({'username': user, 'password_hash': password})
+    pattern = userTokenPassPattern
+    pattern['username'] = user
+    pattern['password_hash'] = password
+    pattern['time'] = get_current_time()
+    token = jwt.encode(pattern, secretKey, algorithm='HS256')
+    resp = Response('success')
+    resp.headers['Authorization'] = token
+    return resp
 
 
 # @app.route('/login')
