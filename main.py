@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import abort
 import time
 from flask import jsonify
 from flask import request
@@ -58,10 +59,30 @@ def show_all_lots():
 def function_for_id_lots(id_lot=None):
     # если пусто получить все данные о лотах
     # если id, то вывести все лоты
-    if id_lot:
-        return search_lots(id_lot)
-    else:
-        return show_all_lots()
+    print(request.headers)
+    auth = str(request.headers['Authorization'])
+    token = auth.split(' ')[1]
+    object = jwt.decode(token, secretKey, algorithms=['HS256'])
+    prevTimeS = object['time']
+    prevTime = int(prevTimeS)
+    currtime = get_current_time()
+    diff = currtime - prevTime
+    if diff > 2 * 60 * 60 * 1000:
+        abort(401)
+        return
+    user = object['username']
+    password = object['password_hash']
+    users = get_db(get_connection())['users']
+    found = users.find({'username': user})
+    for user in found:
+        print(user)
+        print(user['password_hash'])
+        if user['password_hash'] == password:
+            if id_lot:
+                return search_lots(id_lot)
+            else:
+                return show_all_lots()
+    abort(401)
 
 
 @app.route('/')
@@ -91,16 +112,16 @@ def register():
     pattern['password_hash'] = password
     pattern['time'] = get_current_time()
     token = jwt.encode(pattern, secretKey, algorithm='HS256')
+    object = jwt.decode(token, secretKey, algorithm='HS256')
+    print(str(token, 'utf-8'))
+    print(object)
     resp = Response('success')
-    resp.headers['Authorization'] = 'Bearer ' + str(token)
+    resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
     return resp
 
 
 @app.route('/login')
 def login():
-    auth = request.headers['Authorizationn']
-    object = jwt.decode(auth, secretKey, algorithm='HS256')
-
     return 'asd'
 
 
