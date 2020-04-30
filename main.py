@@ -1,11 +1,15 @@
 from flask import Flask
 from flask import jsonify
+from flask import request
+import jwt
 from bson.objectid import ObjectId
 import pymongo
 
 # везде выводить до 200 записи
 
 app = Flask(__name__)
+secretKey = "makeAmericaGreatAgain"
+userTokenPassPattern = {"user": "", "pass": "", "time": 0}
 
 
 def get_connection():
@@ -56,7 +60,7 @@ def function_for_id_lots(id_lot=None):
 
 @app.route('/')
 def hello():
-    return 'Hello world!!!'
+    return 'This is a backend server for project Morning Wood'
 
 
 @app.route('/logout')
@@ -64,6 +68,24 @@ def delete_data_autif():
     # стирает данные о аутентификации
     pass
 
+
+@app.route('/registration')
+def register():
+    data = request.json
+    user = data['user']
+    password=data['pass']
+    print(data)
+    print(user)
+    print(password)
+    return 'asdasfdcx'
+
+
+# @app.route('/login')
+# def login():
+#     auth = request.headers['Authentification']
+#     object = jwt.decode(auth, secretKey, algorithm='HS256')
+#
+#     return 'asd'
 
 @app.route('/register')
 def store_password():
@@ -79,20 +101,7 @@ def store_password():
 
 @app.route('/login')
 def get_data_login():
-    """
-    request: json { login: string, password: string }
-      response: json { user: {login: string}, token: string }
-    """
     pass
-
-
-@app.route('/mongo')
-def testMongoConnection():
-    conn = pymongo.MongoClient(
-        'mongodb://afanasiev_alexey:funny valentine did nothing wrong@140.82.36.93:27017/morning_wood')
-    name = conn.get_database().name
-    conn.close()
-    return name
 
 
 print(__name__)
