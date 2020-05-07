@@ -41,7 +41,12 @@ def auth(request):
 
 
 def auth_without_time_check(request):
-
+    """
+    Функция, проверяющая наличие
+    пользователя по логину
+    :param request: объект Flask
+    :return: True - нашелся, False -  иначе
+    """
     data = request.json
     user = data['user']
     password = data['pass']
@@ -55,7 +60,10 @@ def auth_without_time_check(request):
 
 
 def get_user(request):
-
+    """
+    :param request:
+    :return:
+    """
     data = request.json
     user = data['user']
     password = data['pass']
@@ -67,7 +75,11 @@ def get_user(request):
 
 
 def get_connection():
-
+    """
+    Функция, создающая пользователя для управления
+    базой данных
+    :return: соединение с базой данных от имени данного пользователя
+    """
     return pymongo.MongoClient(
         'mongodb://afanasiev_alexey:funny valentine did nothing wrong@140.82.36.93:27017/morning_wood')
 
