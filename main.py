@@ -16,17 +16,22 @@ userTokenPassPattern = {'username': '', 'password_hash': '', 'time': 0}
 
 
 def auth(request):
-    auth = str(request.headers['Authorization'])
-    token = auth.split(' ')[1]
-    object = jwt.decode(token, secretKey, algorithms=['HS256'])
-    prevTimeS = object['time']
-    prevTime = int(prevTimeS)
-    currtime = get_current_time()
-    diff = currtime - prevTime
+    """
+    Функция, проверяющая наличие пользователя и срок годности
+    токена
+    :return: True - если найден пользователь, False - иначе
+    """
+    aut = str(request.headers['Authorization'])
+    token = aut.split(' ')[1]
+    obj = jwt.decode(token, secretKey, algorithms=['HS256'])
+    prev_time_s = obj['time']
+    prev_time = int(prev_time_s)
+    curr_time = get_current_time()
+    diff = curr_time - prev_time
     if diff > 2 * 60 * 60 * 1000:
         return False
-    user = object['username']
-    password = object['password_hash']
+    user = obj['username']
+    password = obj['password_hash']
     users = get_db(get_connection())['users']
     found = users.find({'username': user})
     for user in found:
@@ -35,7 +40,8 @@ def auth(request):
     return False
 
 
-def authWithoutTimeCheck(request):
+def auth_without_time_check(request):
+
     data = request.json
     user = data['user']
     password = data['pass']
@@ -48,7 +54,8 @@ def authWithoutTimeCheck(request):
     return False
 
 
-def getUser(request):
+def get_user(request):
+
     data = request.json
     user = data['user']
     password = data['pass']
@@ -60,19 +67,28 @@ def getUser(request):
 
 
 def get_connection():
+
     return pymongo.MongoClient(
         'mongodb://afanasiev_alexey:funny valentine did nothing wrong@140.82.36.93:27017/morning_wood')
 
 
 def get_db(connection):
+    """
+    Функция, которая устанавливает соединение
+    с MongoDB
+    :param connection:
+    :return: соединение с базой данных
+    """
     return connection.get_database('morning_wood')
 
 
 def get_current_time():
+
     return int(round(time.time() * 1000))
 
 
 def search_lots(id_lots):
+
     conn = get_connection()
     db = get_db(conn)
     collection = db.get_collection('lots')
@@ -91,12 +107,18 @@ def search_lots(id_lots):
 
 
 def show_all_lots():
+
     return search_lots('')
 
 
 @app.route('/lots')
 @app.route('/lots/<id_lot>')
 def function_for_id_lots(id_lot=None):
+    """
+    Функция, выводящая товары по id
+    :param id_lot: str, id товара
+    :return: список товаров
+    """
     re = auth(request)
     if re:
         if id_lot:
@@ -109,11 +131,17 @@ def function_for_id_lots(id_lot=None):
 
 @app.route('/')
 def hello():
+    """
+    Функция по умолчанию, показывающая
+    установление связи с бекэндом
+    :return: ответ бэкенда
+    """
     return 'This is a backend server for project Morning Wood'
 
 
 @app.route('/registration')
 def register():
+
     data = request.json
     user = data['user']
     password = data['pass']
@@ -125,7 +153,6 @@ def register():
     pattern['password_hash'] = password
     pattern['time'] = get_current_time()
     token = jwt.encode(pattern, secretKey, algorithm='HS256')
-    object = jwt.decode(token, secretKey, algorithm='HS256')
     resp = Response('success')
     resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
     return resp
@@ -133,14 +160,14 @@ def register():
 
 @app.route('/login')
 def login():
-    if (authWithoutTimeCheck(request)):
-        user = getUser(request)
+
+    if (auth_without_time_check(request)):
+        user = get_user(request)
         pattern = userTokenPassPattern
         pattern['username'] = user['username']
         pattern['password_hash'] = user['password_hash']
         pattern['time'] = get_current_time()
         token = jwt.encode(pattern, secretKey, algorithm='HS256')
-        object = jwt.decode(token, secretKey, algorithm='HS256')
         resp = Response('success')
         resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
         return resp
@@ -149,5 +176,3 @@ def login():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-# app.run(debug=True)
