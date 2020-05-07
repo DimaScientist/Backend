@@ -16,7 +16,6 @@ userTokenPassPattern = {'username': '', 'password_hash': '', 'time': 0}
 
 
 def auth(request):
-    print(request.headers)
     auth = str(request.headers['Authorization'])
     token = auth.split(' ')[1]
     object = jwt.decode(token, secretKey, algorithms=['HS256'])
@@ -29,12 +28,8 @@ def auth(request):
     user = object['username']
     password = object['password_hash']
     users = get_db(get_connection())['users']
-    print(user)
-    print(password)
     found = users.find({'username': user})
     for user in found:
-        print(user)
-        print(user['password_hash'])
         if user['password_hash'] == password:
             return True
     return False
@@ -83,19 +78,15 @@ def search_lots(id_lots):
     collection = db.get_collection('lots')
     res = []
     if id_lots == '':
-        print("empty id")
         for lot in collection.find():
             temp = lot
             temp['_id'] = str(temp['_id'])
             res.append(temp)
-            print(temp)
     else:
-        print("not empty id")
         for lot in collection.find({'_id': ObjectId(id_lots)}):
             temp = lot
             temp['_id'] = str(temp['_id'])
             res.append(temp)
-            print(temp)
     return jsonify(res)
 
 
@@ -107,7 +98,6 @@ def show_all_lots():
 @app.route('/lots/<id_lot>')
 def function_for_id_lots(id_lot=None):
     re = auth(request)
-    print(re)
     if re:
         if id_lot:
             return search_lots(id_lot)
@@ -127,9 +117,6 @@ def register():
     data = request.json
     user = data['user']
     password = data['pass']
-    print(data)
-    print(user)
-    print(password)
     bd = get_db(get_connection())
     collection = bd.get_collection('users')
     collection.insert({'username': user, 'password_hash': password})
@@ -139,8 +126,6 @@ def register():
     pattern['time'] = get_current_time()
     token = jwt.encode(pattern, secretKey, algorithm='HS256')
     object = jwt.decode(token, secretKey, algorithm='HS256')
-    # print(str(token, 'utf-8'))
-    # print(object)
     resp = Response('success')
     resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
     return resp
@@ -156,15 +141,12 @@ def login():
         pattern['time'] = get_current_time()
         token = jwt.encode(pattern, secretKey, algorithm='HS256')
         object = jwt.decode(token, secretKey, algorithm='HS256')
-        # print(str(token, 'utf-8'))
-        print(object)
         resp = Response('success')
         resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
         return resp
     abort(401)
 
 
-print(__name__)
 if __name__ == '__main__':
     app.run(debug=True)
 
