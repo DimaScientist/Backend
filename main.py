@@ -119,7 +119,10 @@ def search_lots(id_lots):
 
 
 def show_all_lots():
-
+    """
+    Функция, выводящщая все товары
+    :return: json-массив всех товаров
+    """
     return search_lots('')
 
 
@@ -172,6 +175,10 @@ def register():
 
 @app.route('/login')
 def login():
+    """
+    Функция авторизации
+    :return: Response, ответ на попытку авторизации
+    """
 
     if (auth_without_time_check(request)):
         user = get_user(request)
