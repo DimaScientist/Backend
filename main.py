@@ -40,6 +40,30 @@ def auth(request):
     return False
 
 
+def authWithoutTimeCheck(request):
+    data = request.json
+    user = data['user']
+    password = data['pass']
+    users = get_db(get_connection())['users']
+    found = users.find({'username': user})
+    for user in found:
+
+        if user['password_hash'] == password:
+            return True
+    return False
+
+
+def getUser(request):
+    data = request.json
+    user = data['user']
+    password = data['pass']
+    users = get_db(get_connection())['users']
+    found = users.find({'username': user})
+    for user in found:
+        if user['password_hash'] == password:
+            return user
+
+
 def get_connection():
     return pymongo.MongoClient(
         'mongodb://afanasiev_alexey:funny valentine did nothing wrong@140.82.36.93:27017/morning_wood')
@@ -115,8 +139,8 @@ def register():
     pattern['time'] = get_current_time()
     token = jwt.encode(pattern, secretKey, algorithm='HS256')
     object = jwt.decode(token, secretKey, algorithm='HS256')
-    print(str(token, 'utf-8'))
-    print(object)
+    # print(str(token, 'utf-8'))
+    # print(object)
     resp = Response('success')
     resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
     return resp
@@ -124,8 +148,20 @@ def register():
 
 @app.route('/login')
 def login():
-
-    return 'asd'
+    if (authWithoutTimeCheck(request)):
+        user = getUser(request)
+        pattern = userTokenPassPattern
+        pattern['username'] = user['username']
+        pattern['password_hash'] = user['password_hash']
+        pattern['time'] = get_current_time()
+        token = jwt.encode(pattern, secretKey, algorithm='HS256')
+        object = jwt.decode(token, secretKey, algorithm='HS256')
+        # print(str(token, 'utf-8'))
+        print(object)
+        resp = Response('success')
+        resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
+        return resp
+    abort(401)
 
 
 print(__name__)
