@@ -95,12 +95,10 @@ def get_db(connection):
 
 
 def get_current_time():
-
     return int(round(time.time() * 1000))
 
 
 def search_lots(id_lots):
-
     conn = get_connection()
     db = get_db(conn)
     collection = db.get_collection('lots')
@@ -135,13 +133,13 @@ def function_for_id_lots(id_lot=None):
     :return: список товаров
     """
     re = auth(request)
-    if re:
-        if id_lot:
-            return search_lots(id_lot)
-        else:
-            return show_all_lots()
+    # if re:
+    if id_lot:
+        return search_lots(id_lot)
     else:
-        abort(401)
+        return show_all_lots()
+# else:
+#     abort(401)
 
 
 @app.route('/')
@@ -156,7 +154,6 @@ def hello():
 
 @app.route('/registration')
 def register():
-
     data = request.json
     user = data['user']
     password = data['pass']
@@ -195,4 +192,3 @@ def login():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
