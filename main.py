@@ -132,7 +132,7 @@ def function_for_id_lots(id_lot=None):
     :param id_lot: str, id товара
     :return: список товаров
     """
-    re = auth(request)
+    # re = auth(request)
     # if re:
     if id_lot:
         return search_lots(id_lot)
