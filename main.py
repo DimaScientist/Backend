@@ -140,7 +140,6 @@ def login():
         pattern['password_hash'] = user['password_hash']
         pattern['time'] = get_current_time()
         token = jwt.encode(pattern, secretKey, algorithm='HS256')
-        object = jwt.decode(token, secretKey, algorithm='HS256')
         resp = Response('success')
         resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
         return resp
@@ -150,4 +149,3 @@ def login():
 if __name__ == '__main__':
     app.run(debug=True)
 
-# app.run(debug=True)
