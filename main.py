@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask
 from flask import abort
 import time
@@ -113,7 +115,12 @@ def search_lots(id_lots):
             temp = lot
             temp['_id'] = str(temp['_id'])
             res.append(temp)
-    return jsonify(res)
+
+    resp = jsonify(res)
+    resp.headers.add("Access-Control-Allow-Origin", "*")
+    resp.headers.add('Access-Control-Allow-Headers', "*")
+    resp.headers.add('Access-Control-Allow-Methods', "*")
+    return resp
 
 
 def show_all_lots():
@@ -138,6 +145,8 @@ def function_for_id_lots(id_lot=None):
         return search_lots(id_lot)
     else:
         return show_all_lots()
+
+
 # else:
 #     abort(401)
 
@@ -167,6 +176,9 @@ def register():
     token = jwt.encode(pattern, secretKey, algorithm='HS256')
     resp = Response('success')
     resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
+    resp.headers.add("Access-Control-Allow-Origin", "*")
+    resp.headers.add('Access-Control-Allow-Headers', "*")
+    resp.headers.add('Access-Control-Allow-Methods', "*")
     return resp
 
 
@@ -186,10 +198,13 @@ def login():
         token = jwt.encode(pattern, secretKey, algorithm='HS256')
         resp = Response('success')
         resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
+        resp.headers.add("Access-Control-Allow-Origin", "*")
+        resp.headers.add('Access-Control-Allow-Headers', "*")
+        resp.headers.add('Access-Control-Allow-Methods', "*")
         return resp
     abort(401)
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
+app.config['CORS_HEADERS'] = 'Content-Type'
