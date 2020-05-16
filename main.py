@@ -161,7 +161,7 @@ def hello():
     return 'This is a backend server for project Morning Wood'
 
 
-@app.route('/registration')
+@app.route('/registration', methods=['POST'])
 def register():
     data = request.json
     user = data['user']
@@ -182,7 +182,7 @@ def register():
     return resp
 
 
-@app.route('/login')
+@app.route('/login', methods=['POST'])
 def login():
     """
     Функция авторизации
