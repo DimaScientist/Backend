@@ -163,6 +163,7 @@ def hello():
 
 @app.route('/registration', methods=['POST'])
 def register():
+    print(request)
     data = request.json
     user = data['user']
     password = data['pass']
@@ -188,7 +189,7 @@ def login():
     Функция авторизации
     :return: Response, ответ на попытку авторизации
     """
-
+    print(request)
     if (auth_without_time_check(request)):
         user = get_user(request)
         pattern = userTokenPassPattern
@@ -196,8 +197,12 @@ def login():
         pattern['password_hash'] = user['password_hash']
         pattern['time'] = get_current_time()
         token = jwt.encode(pattern, secretKey, algorithm='HS256')
-        resp = Response('success')
-        resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
+        resp = jsonify({
+            'user': {
+                'username': user['username']
+            }
+        })
+        resp.headers.add('Authorization', 'Bearer ' + (str(token, 'utf-8')))
         resp.headers.add("Access-Control-Allow-Origin", "*")
         resp.headers.add('Access-Control-Allow-Headers', "*")
         resp.headers.add('Access-Control-Allow-Methods', "*")
