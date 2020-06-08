@@ -6,6 +6,7 @@ import time
 from flask import jsonify
 from flask import request
 from flask import Response
+from flask_cors import CORS, cross_origin
 import jwt
 from bson.objectid import ObjectId
 import pymongo
@@ -165,7 +166,8 @@ def hello():
     return 'This is a backend server for project Morning Wood'
 
 
-@app.route('/registration', methods=['POST'])
+@app.route('/signup', methods=['POST'])
+@cross_origin()
 def register():
     print(request)
     data = request.json
@@ -181,13 +183,11 @@ def register():
     token = jwt.encode(pattern, secretKey, algorithm='HS256')
     resp = Response('success')
     resp.headers['Authorization'] = 'Bearer ' + (str(token, 'utf-8'))
-    resp.headers.add("Access-Control-Allow-Origin", "*")
-    resp.headers.add('Access-Control-Allow-Headers', "*")
-    resp.headers.add('Access-Control-Allow-Methods', "*")
     return resp
 
 
 @app.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     """
     Функция авторизации
@@ -207,13 +207,10 @@ def login():
             }
         })
         resp.headers.add('Authorization', 'Bearer ' + (str(token, 'utf-8')))
-        resp.headers.add("Access-Control-Allow-Origin", "*")
-        resp.headers.add('Access-Control-Allow-Headers', "*")
-        resp.headers.add('Access-Control-Allow-Methods', "*")
         return resp
     abort(401)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, resources={r"/*": {"origins": "*"}})
 app.config['CORS_HEADERS'] = 'Content-Type'
