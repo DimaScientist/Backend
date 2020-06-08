@@ -110,13 +110,17 @@ def search_lots(id_lots):
             temp = lot
             temp['_id'] = str(temp['_id'])
             res.append(temp)
+        resp = jsonify(res)
     else:
         for lot in collection.find({'_id': ObjectId(id_lots)}):
             temp = lot
             temp['_id'] = str(temp['_id'])
             res.append(temp)
+        if (len(res) <= 0):
+            abort(400)
+            return
+        resp = jsonify(res[0])
 
-    resp = jsonify(res)
     resp.headers.add("Access-Control-Allow-Origin", "*")
     resp.headers.add('Access-Control-Allow-Headers', "*")
     resp.headers.add('Access-Control-Allow-Methods', "*")
